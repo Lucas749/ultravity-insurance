@@ -1,0 +1,49 @@
+# ignore ALL files in ANY directory named temp
+_pycache_/
+
+*.csv
+
+.env
+
+scipredict-firebase-adminsdk-8u3fs-38b5d85290.json
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/.next
+/app/.next
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+.env*
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.vercel
+
+=======
+__pycache__/
+*.pyc
+*.csv
+*DESKTOP-F3FE26K.py
+*-lucas.py
+node_modules
+typechain-types
+artifacts
+.env
+
+solidity-files-cache.json
