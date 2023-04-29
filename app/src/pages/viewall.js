@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 
   function DashboardPage(props) {
     const { chain, chains } = useNetwork();
-    
+    const classes = useStyles();
 //
 const web3 = new Web3();
 const [rows, setRows] = useState([]);

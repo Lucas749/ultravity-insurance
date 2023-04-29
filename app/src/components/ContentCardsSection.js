@@ -301,8 +301,8 @@ function ContentCardsSection(props) {
             onClose={closeStakeModal}
             aria-labelledby="staking-dialog"
             maxWidth="lg"
-  fullScreen={false}
-  BackdropProps={{ style: { backgroundColor: "rgba(0, 0, 0, 0.7)" }}}
+            fullScreen={false}
+            BackdropProps={{ style: { backgroundColor: "rgba(0, 0, 0, 0.7)" }}}
           >
             {selectedPool && (
               <>
