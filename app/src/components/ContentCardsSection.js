@@ -20,13 +20,22 @@ import TextField from '@mui/material/TextField';
 import { useAccount } from "wagmi";
 import {useSigner} from "wagmi";
 import { BigNumber } from 'ethers';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import {approvingContract, signingContract} from "../util/contract";
 import {abi} from "../util/contract";
 
 function ContentCardsSection(props) {
   const contractAddress = '0x6685c40769f9a2FEEE8D75f64cE1665F89953B28';
-  
+  const { address,isConnecting, isDisconnected } = useAccount();
+  const [connected, setConnected] = useState(false);
+  useEffect(() => {
+    if (address) {
+      setConnected(true);
+    } else {
+      setConnected(false);
+    }
+  }, [address]);
   // ...
   const [selectedPool, setSelectedPool] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -140,7 +149,7 @@ function ContentCardsSection(props) {
   function getRiskScoreColor(riskScore) {
     switch (riskScore) {
       case 1:
-        return "success.main";
+        return "blue";
       case 2:
         return "warning.main";
       case 3:
@@ -153,7 +162,7 @@ function ContentCardsSection(props) {
   function getRiskScoreBorderColor(riskScore) {
     switch (riskScore) {
       case 1:
-        return "success.main";
+        return "blue";
       case 2:
         return "warning.main";
       case 3:
@@ -266,14 +275,19 @@ function ContentCardsSection(props) {
                         </Box>
                       </Box>
                       
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ marginTop: "1rem" }}
-                        onClick={() => openStakeModal(item)}
-                      >
-                        Stake Now
-                      </Button>
+                      {connected ? (
+  <Button
+    variant="contained"
+    color="primary"
+    sx={{ marginTop: "1rem" }}
+    onClick={() => openStakeModal(item)}
+  >
+    Stake Now
+  </Button>
+) : (
+  <ConnectButton />
+)}
+
                     </Box>
                   </CardContent>
                 </CardActionArea>
