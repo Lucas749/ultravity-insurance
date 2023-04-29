@@ -85,6 +85,7 @@ contract InsurancePlatform {
         address to;
         uint256 blockNumber;
         bool claimable;
+        bool refundable;
         bool claimed;
         bool refunded;
     }
@@ -95,6 +96,7 @@ contract InsurancePlatform {
     event InsuranceClaimed(uint256 indexed insuranceID);
     event InsuranceRefunded(uint256 indexed insuranceID);
     event InsuranceMadeClaimable(uint256 indexed insuranceID);
+    event InsuranceMadeRefundable(uint256 indexed insuranceID);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -123,6 +125,7 @@ contract InsurancePlatform {
 
     //Insure transaction
     function createInsurance(
+        uint256 insuranceID,
         uint256 coverAmount,
         uint256 deviationThreshold,
         uint256 ultravityRiskScore,
@@ -134,7 +137,7 @@ contract InsurancePlatform {
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
-    ) public onlyOwner {
+    ) public onlyOwner payable{
         require(
             block.number - simBlockNumber <= blockThreshold,
             "Block threshold exceeded"
@@ -143,10 +146,11 @@ contract InsurancePlatform {
         uint256 insuranceID = insuranceCounter++;
 
         // Implement contract
-        uint256 premiumRate = getPremiumRate(ultravityScore, deviationThreshold);
+        uint256 premiumRate = getPremiumRate(ultravityRiskScore, deviationThreshold);
         uint256 premiumAmount = (coverAmount * premiumRate) / 10000;
 
         insurances[insuranceID] = Insurance(
+            insuranceID,
             coverAmount,
             premiumAmount,
             deviationThreshold,
@@ -157,11 +161,12 @@ contract InsurancePlatform {
             simBlockNumber,
             false,
             false,
+            false,
             false
         );
 
         //Use permit2 to transfer USDC from caller to contract
-        // usdcToken.safeTransferFrom(caller, owner, premiumAmount);
+        // usdcToken.safeTransferFrom(caller, address(this), premiumAmount);
         PERMIT2.permitTransferFrom(
             IPermit2.PermitTransferFrom({
                 permitted: IPermit2.TokenPermissions({
@@ -189,6 +194,39 @@ contract InsurancePlatform {
         emit InsuranceCreated(insuranceID);
     }
 
+    function transferTest(address caller, uint256 premiumAmount) public{
+        usdcToken.safeTransferFrom(caller, address(this), premiumAmount);
+    }
+
+    // TO DELETE TESTING PERMIT2
+    function testTransfer(
+        address caller,
+        address to,
+        IERC20 token,
+        uint256 premiumAmount,
+        uint256 nonce,
+        uint256 deadline,
+        bytes calldata signature
+    ) public {
+        // Use permit2 to transfer USDC from caller to contract
+        PERMIT2.permitTransferFrom(
+            IPermit2.PermitTransferFrom({
+                permitted: IPermit2.TokenPermissions({
+                    token: token,
+                    amount: premiumAmount
+                }),
+                nonce: nonce,
+                deadline: deadline
+            }),
+            IPermit2.SignatureTransferDetails({
+                to: to,
+                requestedAmount: premiumAmount
+            }),
+            caller,
+            signature
+        );
+    }
+
     //Insurance handling logic
     function makeInsuranceClaimable(uint256 insuranceID) public onlyOwner {
         Insurance storage insurance = insurances[insuranceID];
@@ -198,28 +236,18 @@ contract InsurancePlatform {
         emit InsuranceMadeClaimable(insuranceID);
     }
 
-    //Claim
-    function isClaimable(uint256 insuranceID) public {
+    function makeInsuranceRefundable(uint256 insuranceID) public onlyOwner {
         Insurance storage insurance = insurances[insuranceID];
-        require(!insurance.claimed, "Insurance already claimed");
         require(!insurance.refunded, "Insurance already refunded");
-        require(insurance.claimable, "Insurance not marked as claimable");
-        require(
-            msg.sender == insurance.caller,
-            "Only the insured caller can claim"
-        );
+        insurance.refundable = true;
 
-        insurance.claimed = true;
+        emit InsuranceMadeRefundable(insuranceID);
+    }
 
-        //Call payClaim function on the pooling contract to change balances
-        IPools(poolAddress).payClaim(
-            insurance.ultravityRiskScore,
-            insurance.deviationThreshold,
-            insurance.coverAmount,
-            insurance.caller
-        );
-
-        emit InsuranceClaimed(insuranceID);
+    //Claim
+    function isClaimable(uint256 insuranceID)  public view returns (bool) {
+        Insurance storage insurance = insurances[insuranceID];
+        return insurance.claimable;
     }
 
     function claimInsurance(uint256 insuranceID) public {
@@ -247,8 +275,7 @@ contract InsurancePlatform {
     //Refund
     function isRefundable(uint256 insuranceID) public view returns (bool) {
         Insurance storage insurance = insurances[insuranceID];
-        return
-            !insurance.refunded && !insurance.claimed && !insurance.claimable;
+        return insurance.refundable;
     }
 
     function refundInsurance(uint256 insuranceID) public {
@@ -256,7 +283,7 @@ contract InsurancePlatform {
         require(isRefundable(insuranceID), "Insurance not refundable");
         require(
             msg.sender == insurance.caller,
-            "Only the insured caller can refund"
+            "Only the insured caller can refunded"
         );
 
         insurance.refunded = true;
@@ -277,6 +304,17 @@ contract InsurancePlatform {
         uint256 deviationThreshold
     ) public view returns (uint256) {
         return IPools(poolAddress).getPremiumRate(ultravityScore, deviationThreshold);
+    }
+
+
+    function getPremiumAmount(
+        uint256 ultravityScore,
+        uint256 deviationThreshold,
+        uint256 coverAmount
+    ) public view returns (uint256) {
+        uint256 premiumRate = getPremiumRate(ultravityScore, deviationThreshold);
+        uint256 premiumAmount = (coverAmount * premiumRate) / 10000;
+        return premiumAmount;
     }
 
     function getUserInsurances(
@@ -322,9 +360,3 @@ contract InsurancePlatform {
         blockThreshold = newBlockThreshold;
     }
 }
-
-// //RPC commands
-// forge create --rpc-url https://goerli.infura.io/v3/4f2b1c9453fe4700ab8841e8e1e18ba9 --verify --etherscan-api-key WBAYZPI69Q62A2XGWX493WYIDX59744JKB --gas-price 130 --priority-gas-price 2 --gas-limit 1400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Router.sol:InsurancePlatform --constructor-args 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 0x000000000022d473030f116ddee9f6b43ac78ba3
-
-// forge create --rpc-url https://goerli.infura.io/v3/ --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Pools.sol:Pools --constructor-args
-// 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 address poolAddress

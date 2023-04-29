@@ -19,10 +19,16 @@ contract Pools {
         uint256 totalStaked;
         uint256 totalValue;
     }
+    struct UserStake {
+        uint8 scoreBucket;
+        uint8 deviationBucket;
+        uint256 stakedAmount;
+    }
+
 
     mapping(uint8 => mapping(uint8 => Pool)) public pools;
     mapping(address => mapping(uint8 => mapping(uint8 => uint256))) public stakedAmountsByUser;
-    // mapping(address => mapping(uint8 => mapping(uint8 => uint256))) public userShares;
+
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -30,7 +36,7 @@ contract Pools {
     }
 
     modifier onlyRouter() {
-        require(msg.sender == owner, "Only owner can call this function");
+        require(msg.sender == router, "Only router can call this function");
         _;
     }
     function changeOwner(address newOwner) onlyOwner external {
@@ -47,30 +53,24 @@ contract Pools {
     function stake(uint256 amount, uint8 scoreBucket, uint8 deviationBucket) external {
         Pool storage pool = pools[scoreBucket][deviationBucket];
         
-        // uint256 shares = (pool.totalShares == 0 || pool.totalStaked == 0) ? amount : (amount * pool.totalShares) / pool.totalStaked;
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
         stakedAmountsByUser[msg.sender][scoreBucket][deviationBucket] += amount;
         
         pool.totalStaked += amount;
         pool.totalValue += amount;
-        // userShares[msg.sender][scoreBucket][deviationBucket] += amount;
-        // pool.totalShares += shares;
     }
 
     function withdraw(uint256 amount, uint8 scoreBucket, uint8 deviationBucket) external {
         require(stakedAmountsByUser[msg.sender][scoreBucket][deviationBucket] >= amount, "Not enough balance to withdraw");
         Pool storage pool = pools[scoreBucket][deviationBucket];
         
-        // uint256 amount = (shares * pool.totalStaked) / pool.totalShares;
         
         stakedAmountsByUser[msg.sender][scoreBucket][deviationBucket] -= amount;
         uint256 percHolding = (amount) / pool.totalStaked;
+        pool.totalStaked -= amount;
         
-        //TODO change so that users are not eligbile for past rewards before the staked
         uint256 transferAmount = pool.totalValue * percHolding;
-
-        // userShares[msg.sender][scoreBucket][deviationBucket] -= shares;
-        // pool.totalShares -= shares;
+        pool.totalValue -= transferAmount;
         stakingToken.safeTransfer(msg.sender, transferAmount);
     }
 
@@ -154,6 +154,34 @@ contract Pools {
         }
 
         return (scoreIndex, thresholdIndex);
+    }
+
+    function getUserStakes(address user) external view returns (UserStake[] memory) {
+        UserStake[] memory userStakesArray = new UserStake[](9);
+        uint256 count = 0;
+
+        for (uint8 scoreBucket = 0; scoreBucket < 3; scoreBucket++) {
+            for (uint8 deviationBucket = 0; deviationBucket < 3; deviationBucket++) {
+                uint256 stakedAmount = stakedAmountsByUser[user][scoreBucket][deviationBucket];
+
+                if (stakedAmount > 0) {
+                    userStakesArray[count] = UserStake({
+                        scoreBucket: scoreBucket,
+                        deviationBucket: deviationBucket,
+                        stakedAmount: stakedAmount
+                    });
+
+                    count++;
+                }
+            }
+        }
+
+        UserStake[] memory filteredUserStakes = new UserStake[](count);
+        for (uint256 i = 0; i < count; i++) {
+            filteredUserStakes[i] = userStakesArray[i];
+        }
+
+        return filteredUserStakes;
     }
 
     function setPool(uint256 ultravityScore, uint256 deviationThreshold, uint256 baseRate, uint256 minPremium) external onlyOwner {
