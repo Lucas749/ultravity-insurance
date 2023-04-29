@@ -1,0 +1,22 @@
+// //RPC commands
+forge create --rpc-url https://eth-goerli.g.alchemy.com/v2/VftFU7tFVH2gGnJdalT4MEw40ZGKSga8 --verify --etherscan-api-key WBAYZPI69Q62A2XGWX493WYIDX59744JKB --gas-price 160 --priority-gas-price 4 --gas-limit 1400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Router.sol:InsurancePlatform --constructor-args 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 0x000000000022d473030f116ddee9f6b43ac78ba3
+
+forge create --rpc-url https://eth-goerli.g.alchemy.com/v2/VftFU7tFVH2gGnJdalT4MEw40ZGKSga8 --gas-price 160 --priority-gas-price 4 --gas-limit 1400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Router.sol:InsurancePlatform --constructor-args 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 0x000000000022d473030f116ddee9f6b43ac78ba3
+
+forge create --rpc-url https://goerli.infura.io/v3/4f2b1c9453fe4700ab8841e8e1e18ba9 --verify --etherscan-api-key WBAYZPI69Q62A2XGWX493WYIDX59744JKB --gas-price 130 --priority-gas-price 2 --gas-limit 1400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Pools.sol:Pools --constructor-args 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 address poolAddress
+
+cast send XX "approveUSDC()" "" --rpc-url https://goerli.infura.io/v3/4f2b1c9453fe4700ab8841e8e1e18ba9 --gas-price 130 --priority-gas-price 2 --gas-limit 400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4
+
+
+npx hardhat node --fork https://eth-goerli.g.alchemy.com/v2/VftFU7tFVH2gGnJdalT4MEw40ZGKSga8 
+npx hardhat node --fork https://eth-goerli.g.alchemy.com/v2/VftFU7tFVH2gGnJdalT4MEw40ZGKSga8  --fork-block-number 8795584
+
+
+Consider:
+Approve spending of USDC for pool contract
+Approve spending of USDC for permit2 contract
+https://gasperpre.com/how-to-implement-uniswap-permit2-in-your-protocol/
+
+Generate permit2 details and test in remix --> if working write necessary backend
+
+For MVP only token balance changes --> so backend after underwriting retrieve tx and then check if eligbile --> set to claimable
