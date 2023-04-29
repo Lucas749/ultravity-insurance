@@ -47,3 +47,5 @@ artifacts
 .env
 
 solidity-files-cache.json
+Commands
+config.py
