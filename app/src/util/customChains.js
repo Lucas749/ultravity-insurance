@@ -1,23 +1,6 @@
 import { Chain } from 'wagmi'
  
-export const scroll = {
-  id: 534353,
-  name: 'Scroll Alpha Testnet',
-  network: 'scroll',
-  iconUrl: "https://scroll.io/favicon.ico",
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Ether',
-    symbol: 'ETH',
-  },
-  rpcUrls: {
-    public: { http: ["https://alpha-rpc.scroll.io/l2"] },
-    default: { http: ["https://alpha-rpc.scroll.io/l2"] },
-  },
-  blockExplorers: {
-    default: { name: 'SnowTrace', url: 'https://blockscout.scroll.io' },
-  },
-}
+
 
 export const mantle = {
     id: 5001,

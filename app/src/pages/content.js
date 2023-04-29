@@ -6,14 +6,7 @@ function ContentPage(props) {
   return (
     <>
       <Meta title="Content" />
-      <ContentCardsSection
-        bgColor="default"
-        size="medium"
-        bgImage=""
-        bgImageOpacity={1}
-        title="Featured Content"
-        subtitle=""
-      />
+    
     </>
   );
 }

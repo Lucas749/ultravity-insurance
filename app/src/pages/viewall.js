@@ -112,7 +112,7 @@ const [rows, setRows] = useState([]);
       
           
           
-         <ContentCardsSection>  </ContentCardsSection>
+         <ContentCardsSection />  
               
                
     

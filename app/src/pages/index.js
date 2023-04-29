@@ -1,6 +1,5 @@
 import React from "react";
 import HeroSection from "components/HeroSection";
-import ContentCardsSection from "components/ContentCardsSection";
 import StatsSection from "components/StatsSection";
 import { makeStyles } from "@mui/styles";
 function IndexPage(props) {
@@ -27,13 +26,7 @@ function IndexPage(props) {
     buttonPath="/pricing"
     useStyles = {useStyles}
   />
-  <StatsSection
-    bgColor="default"
-    size="medium"
-    bgImage=""
-    bgImageOpacity={1}
-    useStyles = {useStyles}
-  />
+
  
 
 

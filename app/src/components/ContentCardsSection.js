@@ -1,4 +1,5 @@
-import React from "react";
+import { useEffect, useState, useCallback } from 'react';
+import Web3 from 'web3';
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -11,8 +12,61 @@ import SectionHeader from "components/SectionHeader";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import { useAccount } from "wagmi";
+import {useSigner} from "wagmi";
+import { BigNumber } from 'ethers';
+
+import {approvingContract, signingContract} from "../util/contract";
+import {abi} from "../util/contract";
 
 function ContentCardsSection(props) {
+  const contractAddress = '0x6685c40769f9a2FEEE8D75f64cE1665F89953B28';
+  
+  // ...
+  const [selectedPool, setSelectedPool] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [stakeAmount, setStakeAmount] = useState('');
+
+  function openStakeModal(pool) {
+    setSelectedPool(pool);
+    setModalOpen(true);
+  }
+
+  function closeStakeModal() {
+    setModalOpen(false);
+    setStakeAmount('');
+  }
+  const {data: signer, isError, isLoading} = useSigner();
+  const approveContract = approvingContract.connect(signer)
+  const amountInWei = BigNumber.from('10000000000000000');
+
+  const contractWithSigner = signingContract.connect(signer)
+  const handleStakingTransaction = async (amount, scoreBucket, deviationBucket) => {
+    try {
+      let gasPrice = await signer.getGasPrice();
+
+    await approveContract.approve("0x71C2468664b8c0c7d0ad0eA59C1fc1ddA15CDA7c", BigNumber.from('10000000000000000'),  {
+      gasLimit: 300000,
+      gasPrice: gasPrice.mul(1),
+    });
+
+    let gasPrice = await signer.getGasPrice();
+      console.log(amount, scoreBucket, deviationBucket)
+      await contractWithSigner.stake(amount, scoreBucket, deviationBucket, {
+        gasLimit: 300000,
+        gasPrice: gasPrice.mul(1),
+      });
+    
+    } catch (error) {
+      console.error('Error staking:', error);
+    }
+  };
+  
   const items = [
     {
       riskScore: 3,
@@ -216,6 +270,7 @@ function ContentCardsSection(props) {
                         variant="contained"
                         color="primary"
                         sx={{ marginTop: "1rem" }}
+                        onClick={() => openStakeModal(item)}
                       >
                         Stake Now
                       </Button>
@@ -227,7 +282,45 @@ function ContentCardsSection(props) {
           ))}
         </Grid>
       </Container>
+       <Dialog
+            open={modalOpen}
+            onClose={closeStakeModal}
+            aria-labelledby="staking-dialog"
+            maxWidth="lg"
+  fullScreen={false}
+  BackdropProps={{ style: { backgroundColor: "rgba(0, 0, 0, 0.7)" }}}
+          >
+            {selectedPool && (
+              <>
+                <DialogTitle id="staking-dialog">Stake in {selectedPool.title}</DialogTitle>
+                <DialogContent>
+                  <Typography>APR: {selectedPool.apr}</Typography>
+                  <TextField
+                    label="Amount to stake"
+                    value={stakeAmount}
+                    onChange={(e) => setStakeAmount(e.target.value)}
+                    type="number"
+                    variant="outlined"
+                    fullWidth
+                  />
+                  <Typography>
+                    Predicted annual return:{" "}
+                    {((parseFloat(stakeAmount) * parseFloat(selectedPool.apr)) / 100).toFixed(2)}{" "}
+                    {selectedPool.amount.split(" ")[1]}
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={closeStakeModal}>Cancel</Button>
+                  <Button onClick={() => handleStakingTransaction(10, 0, 0)} color="primary">
+                    Stake
+                  </Button>
+                </DialogActions>
+              </>
+            )}
+          </Dialog>
     </Section>
+
+    
   );
 }
 
