@@ -102,15 +102,12 @@ contract Pools {
         stakingToken.safeTransfer(recipient, premium);
     }
     
-    function setPool(uint8 scoreBucket, uint8 deviationBucket, uint256 baseRate, uint256 minPremium) external onlyOwner {
-        pools[scoreBucket][deviationBucket] = Pool({
-            baseRate: baseRate,
-            minPremium: minPremium,
-            deviationThreshold: deviationBucket,
-            score: scoreBucket,
-            totalStaked: 0,
-            totalValue: 0
-        });
+    function getPremiumRate(uint256 ultravityScore, uint256 deviationThreshold) external view returns (uint256){
+        (uint8 scoreBucket, uint8 deviationBucket) = getPoolIndex(ultravityScore, deviationThreshold);
+        
+        Pool storage pool = pools[scoreBucket][deviationBucket];
+        
+        return pool.baseRate;
     }
 
     function getPool(uint256 ultravityScore, uint256 deviationThreshold) external view returns (Pool memory) {

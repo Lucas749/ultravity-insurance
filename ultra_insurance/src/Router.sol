@@ -42,7 +42,11 @@ interface IPermit2 {
 }
 
 interface IPools {
-    function insure(uint256 ultravityScore, uint256 deviationThreshold, uint256 premium) external;
+    function insure(
+        uint256 ultravityScore,
+        uint256 deviationThreshold,
+        uint256 premium
+    ) external;
 
     function payClaim(
         uint256 ultravityScore,
@@ -57,6 +61,8 @@ interface IPools {
         uint256 premium,
         address recipient
     ) external;
+
+    function getPremiumRate(uint256 ultravityScore, uint256 deviationThreshold) external view returns (uint256);
 }
 
 contract InsurancePlatform {
@@ -95,7 +101,12 @@ contract InsurancePlatform {
         _;
     }
 
-    constructor(address usdcAddress, uint256 _blockThreshold, IPermit2 _permit, address _poolAddress) {
+    constructor(
+        address usdcAddress,
+        uint256 _blockThreshold,
+        IPermit2 _permit,
+        address _poolAddress
+    ) {
         usdcToken = IERC20(usdcAddress);
         poolAddress = _poolAddress;
         owner = msg.sender;
@@ -110,6 +121,7 @@ contract InsurancePlatform {
         usdcToken.approve(poolAddress, maxApproval);
     }
 
+    //Insure transaction
     function createInsurance(
         uint256 coverAmount,
         uint256 deviationThreshold,
@@ -123,12 +135,15 @@ contract InsurancePlatform {
         uint256 deadline,
         bytes calldata signature
     ) public onlyOwner {
-        require(block.number - simBlockNumber <= blockThreshold, "Block threshold exceeded");
+        require(
+            block.number - simBlockNumber <= blockThreshold,
+            "Block threshold exceeded"
+        );
 
         uint256 insuranceID = insuranceCounter++;
 
         // Implement contract
-        uint256 premiumRate = 100; // 1% premium rate (100 basis points);//getPremiumRate(coverAmount, deviationThreshold,ultravityRiskScore);
+        uint256 premiumRate = getPremiumRate(ultravityScore, deviationThreshold);
         uint256 premiumAmount = (coverAmount * premiumRate) / 10000;
 
         insurances[insuranceID] = Insurance(
@@ -157,7 +172,7 @@ contract InsurancePlatform {
                 deadline: deadline
             }),
             IPermit2.SignatureTransferDetails({
-                to: owner,
+                to: address(this),
                 requestedAmount: premiumAmount
             }),
             caller,
@@ -165,11 +180,16 @@ contract InsurancePlatform {
         );
 
         //Call insure function on the pooling contract to change balances
-        IPools(poolAddress).insure(ultravityRiskScore, deviationThreshold, premiumAmount);
+        IPools(poolAddress).insure(
+            ultravityRiskScore,
+            deviationThreshold,
+            premiumAmount
+        );
 
         emit InsuranceCreated(insuranceID);
     }
 
+    //Insurance handling logic
     function makeInsuranceClaimable(uint256 insuranceID) public onlyOwner {
         Insurance storage insurance = insurances[insuranceID];
         require(!insurance.claimable, "Insurance already claimable");
@@ -178,16 +198,28 @@ contract InsurancePlatform {
         emit InsuranceMadeClaimable(insuranceID);
     }
 
-    function refundInsurance(uint256 insuranceID) public {
+    //Claim
+    function isClaimable(uint256 insuranceID) public {
         Insurance storage insurance = insurances[insuranceID];
-        require(isRefundable(insuranceID), "Insurance not refundable");
-        require(msg.sender == insurance.caller, "Only the insured caller can refund");
+        require(!insurance.claimed, "Insurance already claimed");
+        require(!insurance.refunded, "Insurance already refunded");
+        require(insurance.claimable, "Insurance not marked as claimable");
+        require(
+            msg.sender == insurance.caller,
+            "Only the insured caller can claim"
+        );
 
-        insurance.refunded = true;
-        //Call refund function on the pooling contract to change balances
-        IPools(poolAddress).refundInsurance(insurance.ultravityRiskScore, insurance.deviationThreshold, insurance.premiumAmount, insurance.caller);
+        insurance.claimed = true;
 
-        emit InsuranceRefunded(insuranceID);
+        //Call payClaim function on the pooling contract to change balances
+        IPools(poolAddress).payClaim(
+            insurance.ultravityRiskScore,
+            insurance.deviationThreshold,
+            insurance.coverAmount,
+            insurance.caller
+        );
+
+        emit InsuranceClaimed(insuranceID);
     }
 
     function claimInsurance(uint256 insuranceID) public {
@@ -195,19 +227,82 @@ contract InsurancePlatform {
         require(!insurance.claimed, "Insurance already claimed");
         require(!insurance.refunded, "Insurance already refunded");
         require(insurance.claimable, "Insurance not marked as claimable");
-        require(msg.sender == insurance.caller, "Only the insured caller can claim");
+        require(
+            msg.sender == insurance.caller,
+            "Only the insured caller can claim"
+        );
 
         insurance.claimed = true;
- 
+
         //Call payClaim function on the pooling contract to change balances
-        IPools(poolAddress).payClaim(insurance.ultravityRiskScore, insurance.deviationThreshold, insurance.coverAmount, insurance.caller);
+        IPools(poolAddress).payClaim(
+            insurance.ultravityRiskScore,
+            insurance.deviationThreshold,
+            insurance.coverAmount,
+            insurance.caller
+        );
 
         emit InsuranceClaimed(insuranceID);
     }
-
+    //Refund
     function isRefundable(uint256 insuranceID) public view returns (bool) {
         Insurance storage insurance = insurances[insuranceID];
-        return !insurance.refunded && !insurance.claimed && !insurance.claimable;
+        return
+            !insurance.refunded && !insurance.claimed && !insurance.claimable;
+    }
+
+    function refundInsurance(uint256 insuranceID) public {
+        Insurance storage insurance = insurances[insuranceID];
+        require(isRefundable(insuranceID), "Insurance not refundable");
+        require(
+            msg.sender == insurance.caller,
+            "Only the insured caller can refund"
+        );
+
+        insurance.refunded = true;
+        //Call refund function on the pooling contract to change balances
+        IPools(poolAddress).refundInsurance(
+            insurance.ultravityRiskScore,
+            insurance.deviationThreshold,
+            insurance.premiumAmount,
+            insurance.caller
+        );
+
+        emit InsuranceRefunded(insuranceID);
+    }
+
+    //Getter functions
+    function getPremiumRate(
+        uint256 ultravityScore,
+        uint256 deviationThreshold
+    ) public view returns (uint256) {
+        return IPools(poolAddress).getPremiumRate(ultravityScore, deviationThreshold);
+    }
+
+    function getUserInsurances(
+        address user
+    ) public view returns (Insurance[] memory) {
+        uint256 userInsuranceCount = 0;
+
+        // Count the number of insurances for the user
+        for (uint256 i = 0; i < insuranceCounter; i++) {
+            if (insurances[i].caller == user) {
+                userInsuranceCount++;
+            }
+        }
+
+        Insurance[] memory userInsurances = new Insurance[](userInsuranceCount);
+        uint256 index = 0;
+
+        // Populate the array with the user's insurances
+        for (uint256 i = 0; i < insuranceCounter; i++) {
+            if (insurances[i].caller == user) {
+                userInsurances[index] = insurances[i];
+                index++;
+            }
+        }
+
+        return userInsurances;
     }
 
     //Setter functions
@@ -218,6 +313,7 @@ contract InsurancePlatform {
     function setPoolAddress(address _poolAddress) public onlyOwner {
         poolAddress = _poolAddress;
     }
+
     function setOwner(address newOwner) public onlyOwner {
         owner = newOwner;
     }
@@ -227,11 +323,8 @@ contract InsurancePlatform {
     }
 }
 
-
-
 // //RPC commands
 // forge create --rpc-url https://goerli.infura.io/v3/4f2b1c9453fe4700ab8841e8e1e18ba9 --verify --etherscan-api-key WBAYZPI69Q62A2XGWX493WYIDX59744JKB --gas-price 130 --priority-gas-price 2 --gas-limit 1400000 --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Router.sol:InsurancePlatform --constructor-args 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 0x000000000022d473030f116ddee9f6b43ac78ba3
 
 // forge create --rpc-url https://goerli.infura.io/v3/ --private-key 3a89e041321643b38ad0716e546ce1eed0de048827ecc34e22ef9a154c4c53d4 src/Pools.sol:Pools --constructor-args
 // 0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C 3 0x000000000022d473030f116ddee9f6b43ac78ba3 address poolAddress
-
