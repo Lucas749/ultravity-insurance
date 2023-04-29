@@ -1,0 +1,7 @@
+- Backend flask
+    - Supply insurance data (sim res, all for solidity)
+    - Send insurance tx
+    - Check if nonce of user changes --> if so get latest tx and check if it insured
+    - Check outcome --> if claimable --> distribute directly
+
+- Write dodgy contract for showcasing (might be easier to change sim res)

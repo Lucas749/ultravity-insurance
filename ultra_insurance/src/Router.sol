@@ -1,4 +1,4 @@
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -76,6 +76,7 @@ contract InsurancePlatform {
     IPermit2 public immutable PERMIT2;
 
     struct Insurance {
+        uint256 insuranceId;
         uint256 coverAmount;
         uint256 premiumAmount;
         uint256 deviationThreshold;
@@ -83,14 +84,22 @@ contract InsurancePlatform {
         bytes txCallData;
         address caller;
         address to;
-        uint256 blockNumber;
+        // uint256 simBlockNumber;
+        uint256 simResultsLength;
         bool claimable;
         bool refundable;
         bool claimed;
         bool refunded;
     }
 
+    // Define a new struct for TupleData
+    struct simResult {
+        address addr;
+        uint256 value;
+    }
     mapping(uint256 => Insurance) public insurances;
+
+    mapping(uint256 => simResult[]) public insuranceSimResultData;
 
     event InsuranceCreated(uint256 indexed insuranceID);
     event InsuranceClaimed(uint256 indexed insuranceID);
@@ -132,22 +141,17 @@ contract InsurancePlatform {
         bytes memory txCallData,
         address caller,
         address to,
-        uint256 simBlockNumber,
+        simResult[] memory simResults,
         // uint256 premiumAmount,
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
     ) public onlyOwner payable{
-        require(
-            block.number - simBlockNumber <= blockThreshold,
-            "Block threshold exceeded"
-        );
-
         uint256 insuranceID = insuranceCounter++;
 
         // Implement contract
-        uint256 premiumRate = getPremiumRate(ultravityRiskScore, deviationThreshold);
-        uint256 premiumAmount = (coverAmount * premiumRate) / 10000;
+        // uint256 premiumRate = getPremiumRate(ultravityRiskScore, deviationThreshold);
+        uint256 premiumAmount = (coverAmount * getPremiumRate(ultravityRiskScore, deviationThreshold)) / 10000;
 
         insurances[insuranceID] = Insurance(
             insuranceID,
@@ -158,12 +162,19 @@ contract InsurancePlatform {
             txCallData,
             caller,
             to,
-            simBlockNumber,
+            // simBlockNumber,
+            simResults.length,
             false,
             false,
             false,
             false
         );
+
+        //Store simulation result data
+        for (uint256 i = 0; i < simResults.length; i++) {
+            insuranceSimResultData[insuranceID].push(simResults[i]);
+        }
+
 
         //Use permit2 to transfer USDC from caller to contract
         // usdcToken.safeTransferFrom(caller, address(this), premiumAmount);
@@ -242,6 +253,30 @@ contract InsurancePlatform {
         insurance.refundable = true;
 
         emit InsuranceMadeRefundable(insuranceID);
+    }
+
+    function makeInsuranceClaimableAndPayout(uint256 insuranceID) public onlyOwner {
+        Insurance storage insurance = insurances[insuranceID];
+        require(!insurance.claimable, "Insurance already claimable");
+        insurance.claimable = true;
+
+        emit InsuranceMadeClaimable(insuranceID);
+
+        require(!insurance.claimed, "Insurance already claimed");
+        require(!insurance.refunded, "Insurance already refunded");
+        require(insurance.claimable, "Insurance not marked as claimable");
+
+        insurance.claimed = true;
+
+        //Call payClaim function on the pooling contract to change balances
+        IPools(poolAddress).payClaim(
+            insurance.ultravityRiskScore,
+            insurance.deviationThreshold,
+            insurance.coverAmount,
+            insurance.caller
+        );
+
+        emit InsuranceClaimed(insuranceID);
     }
 
     //Claim
