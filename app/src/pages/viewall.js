@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from 'ethers';
 import { useRouter } from "next/router";
 import Meta from "components/Meta";
+import ContentCardsSection from "components/ContentCardsSection";
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -80,90 +81,38 @@ const [rows, setRows] = useState([]);
         />
 
         
-        <Grid container={true} spacing={4}>
-        <Grid item={true} xs={12} md={3}>
-        <Card>
-                  <CardContent sx={{ padding: 3 }}>
-                  <Typography sx={{ fontWeight: 'bold'}} className={classes.gradientText} variant='h5'>High Risk</Typography>
-                  <Typography>Highest Risk, highest reward</Typography>
-                  <br/>
-                  </CardContent>
-          </Card>
-          </Grid>
-        <Grid item={true} xs={12} md={3}>
-        <Card>
-          
-                        <CardContent sx={{ padding: 3 }}>
-                        <Container>
-             <Grid container={true} justifyContent="center" >
-            <Grid item={true} mt={3} mb={2} xs={12} sm={3}>
-          
-
-              <Box sx={{ textAlign: "center" }}>
-
-                <Typography sx={{ fontWeight: "bold"}} className={classes.gradientText} variant="h4">{rows?.length}</Typography>
-                <Typography  ml={-2} variant="overline">Pool1</Typography>
-              </Box>
-            </Grid>
-           </Grid>
-           </Container>
-              </CardContent>
-          </Card>
-          </Grid>
-          <Grid item={true} xs={12} md={3}>
-                <Card>
-                      <CardContent sx={{ padding: 3 }}>
-                      <Container>
-                    <Grid container={true} justifyContent="center" >
-                    <Grid item={true} mt={3} mb={2} xs={12} sm={3}>
-
-                      <Box sx={{ textAlign: "center" }}>
-
-                        <Typography  sx={{ fontWeight: "bold"}} className={classes.gradientText} variant="h4">0</Typography>
-                        <Typography  ml={0} variant="overline">Pool2</Typography>
-
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  </Container>
+        <Grid container={true} spacing={2}>
+          <Grid item={true} xs={12} md={4}>
+              <Card>
+                      <CardContent sx={{ padding: 3}}>
+                      <Typography sx={{ fontWeight: 'bold'}} className={classes.gradientText} variant='h5'>High Risk</Typography>
+                      <Typography>Highest Risk, highest reward</Typography>
+                      <br/>
                       </CardContent>
-                  </Card>
-          </Grid>
-          <Grid item={true} xs={12} md={3}>
-          <Card>
-                      <CardContent sx={{ padding: 3 }}>
-                      <Container>
-                    <Grid container={true} justifyContent="center" >
-                    <Grid item={true} mt={3} mb={2} xs={12} sm={3}>
-                    
-
-                      <Box sx={{ textAlign: "center" }}>
-
-                        <Typography  sx={{ fontWeight: "bold"}} className={classes.gradientText} variant="h4">0</Typography>
-                        <Typography  ml={0} variant="overline">Pool3</Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  </Container>
-                      </CardContent>
-                  </Card>
-          </Grid>
-          
-          <Grid item={true} xs={12} md={12}>
-          <Card>
-          
-              <CardContent sx={{ padding: 3 }}>
-                <Box>
-
-                <div style={{ width: "100%" }}>
- 
-
-    </div>
-         </Box>
-              </CardContent>
-            </Card>
+              </Card>
             </Grid>
-                    
+            <Grid item={true} xs={12} md={4}>
+              <Card>
+                      <CardContent sx={{ padding: 3}}>
+                      <Typography sx={{ fontWeight: 'bold'}} className={classes.gradientText} variant='h5'>Medium Risk</Typography>
+                      <Typography>Medium risk, medium reward</Typography>
+                      <br/>
+                      </CardContent>
+              </Card>
+            </Grid>
+            <Grid item={true} xs={12} md={4}>
+              <Card>
+                      <CardContent sx={{ padding: 3}}>
+                      <Typography sx={{ fontWeight: 'bold'}} className={classes.gradientText} variant='h5'>Low Risk</Typography>
+                      <Typography>Low risk, low reward</Typography>
+                      <br/>
+                      </CardContent>
+              </Card>
+            </Grid>
+      
+          
+          
+         <ContentCardsSection>  </ContentCardsSection>
               
                
     

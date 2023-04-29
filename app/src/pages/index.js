@@ -1,6 +1,5 @@
 import React from "react";
 import HeroSection from "components/HeroSection";
-import FeaturesSection from "components/FeaturesSection";
 import ContentCardsSection from "components/ContentCardsSection";
 import StatsSection from "components/StatsSection";
 import { makeStyles } from "@mui/styles";
