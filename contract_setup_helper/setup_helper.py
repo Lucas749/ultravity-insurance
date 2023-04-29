@@ -9,6 +9,7 @@ from web3 import Web3
 web3 = Web3(Web3.HTTPProvider(node_url))
 web3.isConnected()
 web3.eth.syncing
+web3.eth.get_block_number()
 chain_id = web3.eth.chain_id
 
 #Set up pools
@@ -48,6 +49,7 @@ for score in scores:
 #Approve WBIT approval
 wbit_contract = web3.eth.contract(address=staking_token, abi = ERC20_abi)
 
+wbit_contract.functions.allowance("0x82cce31fd049b7cd23de3d1f201aea09907b9c25",pool_address).call()
 wbit_approval_data = wbit_contract.functions.approve(pool_address, int(10000*1e18)).buildTransaction({'from': account,'chainId':chain_id, 'gas': 300000, 'gasPrice': 2,'nonce':1})['data']
 
 nonce = web3.eth.get_transaction_count(account)
