@@ -106,7 +106,7 @@ async function getSignature(permitContract,insuranceCntract,tokenAddress,premium
     console.log("Signature:", signature);
 }
 
-const permitContract = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
+const permitContract = "0x000000000022D473030F116dDEE9F6B43aC78BA3"; //0x9345915e2f1d0105695Dd4689774B5f44f67A787
 const insuranceContract = "0x0CC606EA9fDA9556fc4676a5328957A73eAf3201";//"0x35a3a5ed7eEdbdE2Ae8BE83687559564e5Df837f";
 const tokenAddress = "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C";
 const premiumAmount = 100;//ethers.utils.parseEther("100");
