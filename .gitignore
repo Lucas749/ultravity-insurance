@@ -48,5 +48,5 @@ artifacts
 
 solidity-files-cache.json
 Commands
-config.py
+config_private.py
 commands.txt
