@@ -116,7 +116,7 @@ contract Pools {
 
         if (ultravityScore < 50) {
             scoreIndex = 0;
-        } else if (ultravityScore < 80) {
+        } else if (ultravityScore < 70) {
             scoreIndex = 1;
         } else {
             scoreIndex = 2;
@@ -139,7 +139,7 @@ contract Pools {
 
         if (ultravityScore < 50) {
             scoreIndex = 0;
-        } else if (ultravityScore < 80) {
+        } else if (ultravityScore < 70) {
             scoreIndex = 1;
         } else {
             scoreIndex = 2;
