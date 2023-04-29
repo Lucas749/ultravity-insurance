@@ -48,11 +48,11 @@ function ContentCardsSection(props) {
   const contractWithSigner = signingContract.connect(signer)
   const handleStakingTransaction = async (amount, scoreBucket, deviationBucket) => {
     try {
-      let gasPrice = await signer.getGasPrice();
+      let gasAcceptPrice = await signer.getGasPrice();
 
     await approveContract.approve("0x71C2468664b8c0c7d0ad0eA59C1fc1ddA15CDA7c", BigNumber.from('10000000000000000'),  {
       gasLimit: 300000,
-      gasPrice: gasPrice.mul(1),
+      gasPrice: gasAcceptPrice.mul(1),
     });
 
     let gasPrice = await signer.getGasPrice();
