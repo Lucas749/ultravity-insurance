@@ -5,3 +5,15 @@
     - Check outcome --> if claimable --> distribute directly
 
 - Write dodgy contract for showcasing (might be easier to change sim res)
+
+
+LUCAS:
+Server
+Deploy Router Contract
+Test permit2
+View functions router contract
+
+Ben:
+Add button chrome extension to webpage
+Get permit2 examples to work
+Design and implement insure tx webpage
