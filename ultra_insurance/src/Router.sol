@@ -73,7 +73,7 @@ contract InsurancePlatform {
     address public poolAddress;
     uint256 public blockThreshold;
     uint256 public insuranceCounter;
-    IPermit2 public immutable PERMIT2;
+    IPermit2 public PERMIT2;
 
     struct Insurance {
         uint256 insuranceId;
@@ -391,4 +391,9 @@ contract InsurancePlatform {
     function setBlockThreshold(uint256 newBlockThreshold) public onlyOwner {
         blockThreshold = newBlockThreshold;
     }
+
+    function setPermit2(IPermit2 _permit) public onlyOwner {
+        PERMIT2 = _permit;
+    }
+
 }

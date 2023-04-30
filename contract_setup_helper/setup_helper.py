@@ -1,7 +1,7 @@
 import os
 import time
 os.chdir('./contract_setup_helper')
-from config import node_url,staking_token, pool_address, router_address, ERC20_abi, pool_abi, router_abi
+from config import node_url,staking_token, pool_address, router_address, ERC20_abi, pool_abi, router_abi, permit2_contract_mantle
 from config_private import private_key, account
 
 
@@ -47,9 +47,9 @@ for score in scores:
         counter += 1
 
 #Approve WBIT approval
+#Staking contract
 wbit_contract = web3.eth.contract(address=staking_token, abi = ERC20_abi)
 
-wbit_contract.functions.allowance("0x82cce31fd049b7cd23de3d1f201aea09907b9c25",pool_address).call()
 wbit_approval_data = wbit_contract.functions.approve(pool_address, int(10000*1e18)).buildTransaction({'from': account,'chainId':chain_id, 'gas': 300000, 'gasPrice': 2,'nonce':1})['data']
 
 nonce = web3.eth.get_transaction_count(account)
@@ -68,7 +68,7 @@ _ = web3.eth.send_raw_transaction(sign_tx.rawTransaction)
 for i in range(4):
     for j in range(4):
         print(f"Staking pool {i} and {j}")
-        call_data = staking_func(15, i, j).buildTransaction({'from': account,'chainId':chain_id, 'gas': 300000, 'gasPrice': 2,'nonce':1})['data']
+        call_data = staking_func(int(10*1e18), i, j).buildTransaction({'from': account,'chainId':chain_id, 'gas': 300000, 'gasPrice': 2,'nonce':1})['data']
 
         nonce = web3.eth.get_transaction_count(account)
         tx_build = {'nonce': nonce,
@@ -104,4 +104,21 @@ construct_txn = contract_.constructor().buildTransaction({
     'gasPrice': web3.eth.gas_price})
 
 sign_tx = web3.eth.account.signTransaction(construct_txn, private_key=private_key)
+_ = web3.eth.send_raw_transaction(sign_tx.rawTransaction)
+
+#Approve WBIT for permit2 contract
+wbit_contract = web3.eth.contract(address=staking_token, abi = ERC20_abi)
+
+wbit_approval_data = wbit_contract.functions.approve(permit2_contract_mantle, int(10000*1e18)).buildTransaction({'from': account,'chainId':chain_id, 'gas': 300000, 'gasPrice': 2,'nonce':1})['data']
+
+nonce = web3.eth.get_transaction_count(account)
+tx_build = {'nonce': nonce,
+    'gas': 300000,
+    'gasPrice': web3.eth.gas_price,
+    'to': wbit_contract.address,
+    "value": 0,
+    "data": wbit_approval_data,
+    'chainId': chain_id}
+
+sign_tx = web3.eth.account.signTransaction(tx_build, private_key=private_key)
 _ = web3.eth.send_raw_transaction(sign_tx.rawTransaction)

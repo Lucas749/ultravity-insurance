@@ -104,11 +104,12 @@ async function getSignature(permitContract,insuranceContract,tokenAddress,premiu
     const signature = await signer._signTypedData(domain, types, values);
 
     console.log("Signature:", signature);
+    return {"sig":signature, "nonce": nonce, "deadline":deadline};
 }
 
-const permitContract = "0x000000000022D473030F116dDEE9F6B43aC78BA3"; //0x9345915e2f1d0105695Dd4689774B5f44f67A787
-const insuranceContract = "0x0CC606EA9fDA9556fc4676a5328957A73eAf3201";//"0x35a3a5ed7eEdbdE2Ae8BE83687559564e5Df837f";
-const tokenAddress = "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C";
+const permitContract = "0x08B4434924801AC9C0B1a65D21562f2964b0787B"; //0x9345915e2f1d0105695Dd4689774B5f44f67A787
+const insuranceContract = "0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1";//"0x35a3a5ed7eEdbdE2Ae8BE83687559564e5Df837f";
+const tokenAddress = "0xc0A7F1B0c9988FbC123f688a521387A51596da47";
 const premiumAmount = 100;//ethers.utils.parseEther("100");
 // getSignature(permitContract,insuranceContract,tokenAddress,premiumAmount);
 // Request user account access
