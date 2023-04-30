@@ -9,7 +9,7 @@ import SectionHeader from "components/SectionHeader";
 import Typography from "@mui/material/Typography";
 
 function HeroSection(props) {
-    const classes = props.useStyles();
+  const GradientText = props.gradientText;
 
   return (
     <Section
@@ -23,8 +23,15 @@ function HeroSection(props) {
           <Grid container={true} item={true} direction="column" xs={12} md={12}>
             <Box sx={{ textAlign: { xs: "center", md: "center"} }}>
                 <Box>
-            <Typography variant="h2"  sx={{ fontWeight: "bold", mt: 8, mb: 4}} className={classes.gradientText} align="center">Smart Contract Insurance
+                <GradientText>
+
+            <Typography variant="h2"  sx={{ fontWeight: "bold", mt: 8, mb: 4}} align="center">Smart Contract Insurance
 </Typography>
+</GradientText>
+
+
+
+
             <Typography variant="p"   align="center">Stake your capital and earn a yield protecting smart contracts.
 </Typography>
 

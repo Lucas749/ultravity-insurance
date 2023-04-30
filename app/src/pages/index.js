@@ -1,16 +1,16 @@
 import React from "react";
 import HeroSection from "components/HeroSection";
 import StatsSection from "components/StatsSection";
-import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/system";
 function IndexPage(props) {
-  const useStyles = makeStyles((theme) => ({
-    gradientText: {
-      backgroundClip: "text",
-      backgroundImage: "linear-gradient(85.9deg, #6F00FF -14.21%, #8A2BE2 18.25%, #A020F0 52.49%, #BA55D3 81.67%, #C71585 111.44%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-    },
-  }));
+  const GradientText = styled("div")({
+    backgroundClip: "text",
+    backgroundImage:
+      "linear-gradient(85.9deg, #6F00FF -14.21%, #8A2BE2 18.25%, #A020F0 52.49%, #BA55D3 81.67%, #C71585 111.44%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  });
+
   return (
     <>
     <HeroSection
@@ -24,8 +24,8 @@ function IndexPage(props) {
     buttonText="Get Started"
     buttonColor="secondary"
     buttonPath="/pricing"
-    useStyles = {useStyles}
-  />
+    gradientText={GradientText}
+    />
 
  
 

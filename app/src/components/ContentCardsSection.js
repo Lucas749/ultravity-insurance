@@ -21,11 +21,91 @@ import { useAccount } from "wagmi";
 import {useSigner} from "wagmi";
 import { BigNumber } from 'ethers';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { getAllPools } from "util/multicall";
+import { ethers } from 'ethers';
+const defaultItems = [
+  {
+    riskScore: 3,
+    title: "Pool 1",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  },
+  {
+    riskScore: 2,
+    title: "Pool 2",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  },
+  {
+    riskScore: 1,
+    title: "Pool 3",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  },
+  {
+    riskScore: 3,
+    title: "Pool 4",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  }
+  ,
+  {
+    riskScore: 2,
+    title: "Pool 5",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  }
+  ,
+  {
+    riskScore: 1,
+    title: "Pool 6",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  }
+  ,
+  {
+    riskScore: 3,
+    title: "Pool 7",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  },
+  {
+    riskScore: 2,
+    title: "Pool 8",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  },
+  {
+    riskScore: 1,
+    title: "Pool 9",
+    description: "A well-established pool with a low risk score.",
+    apr: "12.34%",
+    amount: "1,234.56 ETH",
+  }
+  // Add more items with the necessary data
+];
+
+const rpcUrl = "https://rpc.testnet.mantle.xyz"
+const poolAddress = "0x71C2468664b8c0c7d0ad0eA59C1fc1ddA15CDA7c"
+const poolAbi = [{"type":"constructor","stateMutability":"nonpayable","inputs":[{"type":"address","name":"_stakingToken","internalType":"contract IERC20"},{"type":"address","name":"_router","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"changeOwner","inputs":[{"type":"address","name":"newOwner","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"tuple","name":"","internalType":"struct Pools.Pool","components":[{"type":"uint256","name":"baseRate","internalType":"uint256"},{"type":"uint256","name":"minPremium","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"score","internalType":"uint256"},{"type":"uint256","name":"totalStaked","internalType":"uint256"},{"type":"uint256","name":"totalValue","internalType":"uint256"}]}],"name":"getPool","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint8","name":"","internalType":"uint8"},{"type":"uint8","name":"","internalType":"uint8"}],"name":"getPoolIndex","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"getPremiumRate","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"tuple[]","name":"","internalType":"struct Pools.UserStake[]","components":[{"type":"uint8","name":"scoreBucket","internalType":"uint8"},{"type":"uint8","name":"deviationBucket","internalType":"uint8"},{"type":"uint256","name":"stakedAmount","internalType":"uint256"}]}],"name":"getUserStakes","inputs":[{"type":"address","name":"user","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"insure","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"premium","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"owner","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"payClaim","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"claimAmount","internalType":"uint256"},{"type":"address","name":"recipient","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"baseRate","internalType":"uint256"},{"type":"uint256","name":"minPremium","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"score","internalType":"uint256"},{"type":"uint256","name":"totalStaked","internalType":"uint256"},{"type":"uint256","name":"totalValue","internalType":"uint256"}],"name":"pools","inputs":[{"type":"uint8","name":"","internalType":"uint8"},{"type":"uint8","name":"","internalType":"uint8"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"refundInsurance","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"premium","internalType":"uint256"},{"type":"address","name":"recipient","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"address"}],"name":"router","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"setPool","inputs":[{"type":"uint256","name":"ultravityScore","internalType":"uint256"},{"type":"uint256","name":"deviationThreshold","internalType":"uint256"},{"type":"uint256","name":"baseRate","internalType":"uint256"},{"type":"uint256","name":"minPremium","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"setRouter","inputs":[{"type":"address","name":"_router","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"setStakingToken","inputs":[{"type":"address","name":"_stakingToken","internalType":"contract IERC20"}]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"stake","inputs":[{"type":"uint256","name":"amount","internalType":"uint256"},{"type":"uint8","name":"scoreBucket","internalType":"uint8"},{"type":"uint8","name":"deviationBucket","internalType":"uint8"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"stakedAmountsByUser","inputs":[{"type":"address","name":"","internalType":"address"},{"type":"uint8","name":"","internalType":"uint8"},{"type":"uint8","name":"","internalType":"uint8"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"address","name":"","internalType":"contract IERC20"}],"name":"stakingToken","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[],"name":"withdraw","inputs":[{"type":"uint256","name":"amount","internalType":"uint256"},{"type":"uint8","name":"scoreBucket","internalType":"uint8"},{"type":"uint8","name":"deviationBucket","internalType":"uint8"}]}]
+const maxScoreIndex = 2;
+const maxDeviationIndex = 2;
 
 import {approvingContract, signingContract} from "../util/contract";
 import {abi} from "../util/contract";
 
 function ContentCardsSection(props) {
+  const [items, setItems] = useState(defaultItems);
+  console.log(items)
+  
   const contractAddress = '0x6685c40769f9a2FEEE8D75f64cE1665F89953B28';
   const { address,isConnecting, isDisconnected } = useAccount();
   const [connected, setConnected] = useState(false);
@@ -56,6 +136,7 @@ function ContentCardsSection(props) {
 
   const contractWithSigner = signingContract.connect(signer)
   const handleStakingTransaction = async (amount, scoreBucket, deviationBucket) => {
+    console.log('clicked')
     try {
       let gasAcceptPrice = await signer.getGasPrice();
 
@@ -75,84 +156,65 @@ function ContentCardsSection(props) {
       console.error('Error staking:', error);
     }
   };
+
+
+
+  const getItemIndex = (score, deviationIndex) => {
+    switch (score) {
+      case 0:
+        return deviationIndex * 3;
+      case 1:
+        return deviationIndex * 3 + 1;
+      case 2:
+        return deviationIndex * 3 + 2;
+      default:
+        return 0;
+    }
+  };
   
-  const items = [
-    {
-      riskScore: 3,
-      title: "Pool 1",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    },
-    {
-      riskScore: 2,
-      title: "Pool 2",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    },
-    {
-      riskScore: 1,
-      title: "Pool 3",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    },
-    {
-      riskScore: 3,
-      title: "Pool 4",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    }
-    ,
-    {
-      riskScore: 2,
-      title: "Pool 5",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    }
-    ,
-    {
-      riskScore: 1,
-      title: "Pool 6",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    }
-    ,
-    {
-      riskScore: 3,
-      title: "Pool 7",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    },
-    {
-      riskScore: 2,
-      title: "Pool 8",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    },
-    {
-      riskScore: 1,
-      title: "Pool 9",
-      description: "A well-established pool with a low risk score.",
-      apr: "12.34%",
-      amount: "1,234.56 ETH",
-    }
-    // Add more items with the necessary data
-  ];
+  useEffect(() => {
+    (async () => {
+      const updatedPools = await getAllPools(
+        rpcUrl,
+        poolAddress,
+        poolAbi,
+        maxScoreIndex,
+        maxDeviationIndex
+      );
+      console.log("updatedPools", updatedPools);
+  
+      const updatedItems = [...defaultItems];
+      updatedPools.forEach((poolData) => {
+        const itemIndex = getItemIndex(poolData.score, poolData.deviationIndex);
+        updatedItems[itemIndex] = {
+          ...defaultItems[itemIndex],
+          ...poolData,
+          riskScore: 1 + poolData.score,
+          deviationIndex: poolData.deviationIndex,
+          apr: `${(poolData.baseRate * 100).toFixed(2)}%`, // Set APR based on base-rate
+          amount: `Total Staked: ${poolData.totalStaked} BIT`,
+          description: poolData.deviationIndex === 0
+          ? 'Insures transactions that deviate less than 2'
+          : poolData.deviationIndex === 1
+          ? 'Insures transactions that deviate less than 5'
+          : 'Insures transactions that deviate more than 5',
+        };
+      });
+  
+      setItems(updatedItems);
+    })();
+  }, []);
+  
+  
+  
 
   function getRiskScoreColor(riskScore) {
     switch (riskScore) {
-      case 1:
+      case 3:
         return "blue";
       case 2:
         return "warning.main";
-      case 3:
+      case 1:
         return "error.main";
       default:
         return "textPrimary";
@@ -161,11 +223,11 @@ function ContentCardsSection(props) {
 
   function getRiskScoreBorderColor(riskScore) {
     switch (riskScore) {
-      case 1:
+      case 3:
         return "blue";
       case 2:
         return "warning.main";
-      case 3:
+      case 1:
         return "error.main";
       default:
         return "grey.500";
@@ -193,9 +255,13 @@ function ContentCardsSection(props) {
                 sx={{
                   border: "2px solid",
                   borderColor: getRiskScoreBorderColor(item.riskScore),
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  ":hover": {
+                    transform: "scale(1.05)",
+                    boxShadow: "0 4px 20px 0 rgba(0, 0, 0, 0.12)",
+                  },
                 }}
               >
-                <CardActionArea>
                   <CardContent>
                     <Box
                       sx={{
@@ -277,9 +343,14 @@ function ContentCardsSection(props) {
                       
                       {connected ? (
   <Button
-    variant="contained"
     color="primary"
-    sx={{ marginTop: "1rem" }}
+    variant="contained"
+                  sx={{
+                    backgroundImage: "linear-gradient(85.9deg, #6F00FF -14.21%, #8A2BE2 18.25%, #A020F0 52.49%, #BA55D3 81.67%, #C71585 111.44%)",
+                    color: 'white',
+                    ml: 0,
+                    marginTop: "1rem"
+                  }} 
     onClick={() => openStakeModal(item)}
   >
     Stake Now
@@ -290,7 +361,6 @@ function ContentCardsSection(props) {
 
                     </Box>
                   </CardContent>
-                </CardActionArea>
               </Card>
             </Grid>
           ))}
@@ -307,25 +377,67 @@ function ContentCardsSection(props) {
             {selectedPool && (
               <>
                 <DialogTitle id="staking-dialog">Stake in {selectedPool.title}</DialogTitle>
-                <DialogContent>
-                  <Typography>APR: {selectedPool.apr}</Typography>
+                
+                <DialogContent
+                
+                
+                >
+                   <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+                  
+                  <br></br>
                   <TextField
-                    label="Amount to stake"
+                    label="WBIT to Stake"
                     value={stakeAmount}
                     onChange={(e) => setStakeAmount(e.target.value)}
                     type="number"
+                    id="wbit-input"
+                    className="staking-amount-input"
                     variant="outlined"
                     fullWidth
+                    InputLabelProps={{
+                      style: { color: "white" }
+
+                    }}
                   />
                   <Typography>
-                    Predicted annual return:{" "}
-                    {((parseFloat(stakeAmount) * parseFloat(selectedPool.apr)) / 100).toFixed(2)}{" "}
-                    {selectedPool.amount.split(" ")[1]}
-                  </Typography>
+                  <br></br>
+                    APR: {selectedPool.apr}</Typography>
+                <Typography>
+               
+
+                  Indicative Earnings:{" "}
+                  {((parseFloat(stakeAmount) * parseFloat(selectedPool.apr)) / 100).toFixed(2)} BIT
+                </Typography>
+                </Box>
                 </DialogContent>
-                <DialogActions>
-                  <Button onClick={closeStakeModal}>Cancel</Button>
-                  <Button onClick={() => handleStakingTransaction(10, 0, 0)} color="primary">
+                <DialogActions sx={{ justifyContent: "center" }}>
+                  <Button sx= {{color: "white"}} color="secondary" variant="outlined" onClick={closeStakeModal}>Cancel</Button>
+
+                  
+                  <Button variant="contained"
+                  sx={{
+                    backgroundImage: "linear-gradient(85.9deg, #6F00FF -14.21%, #8A2BE2 18.25%, #A020F0 52.49%, #BA55D3 81.67%, #C71585 111.44%)",
+                    color: 'white',
+                    mr: 0,
+                  }}  
+                  
+                  onClick={() => {
+                    const amountInput = document.getElementById("wbit-input");
+                    const stakingAmount = ethers.utils.parseUnits(amountInput.value, 18); // Assumes 18 decimals
+                    console.log('risk', selectedPool.riskScore-1)
+                    console.log('stake', stakingAmount)
+                    console.log('deviation', selectedPool.deviationIndex)
+                    handleStakingTransaction(stakingAmount, selectedPool.riskScore - 1, selectedPool.deviationIndex);
+                  }}
+                  
+                  >
                     Stake
                   </Button>
                 </DialogActions>

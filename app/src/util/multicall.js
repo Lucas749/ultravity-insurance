@@ -209,7 +209,7 @@ async function getUserStakes(rpc_url, contract_address, abi, user) {
 }
 
 // Returns all live prediction markets
-async function getAllPools(rpc_url, contract_address, abi, maxScoreIndex, maxDeviationIndex) {
+export async function getAllPools(rpc_url, contract_address, abi, maxScoreIndex, maxDeviationIndex) {
     // Get multicall object
     var multicall = await get_multi_call_provider(rpc_url);
 
@@ -275,3 +275,4 @@ async function getAllPools(rpc_url, contract_address, abi, maxScoreIndex, maxDev
     return req_list;
   }
 
+ 
