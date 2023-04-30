@@ -17,7 +17,7 @@ Insurance page under https://ultravityinsure.vercel.app/insure
 
 Chrome extension available [here](https://drive.google.com/file/d/1UTjqJnB62GFmgRR9pAzhbGYkBtRgvjeV/view?usp=sharing) - the extension was not built during this hackathon
     
-    *To install:*
+    To install:
     1. Settings - icon > Tools > Extensions
 
     2. Enable Developer Mode (toggle button in top-right corner)
