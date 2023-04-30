@@ -16,10 +16,11 @@ Staking page under https://ultravityinsure.vercel.app/
 Insurance page under https://ultravityinsure.vercel.app/insure  
 
 Chrome extension available under [here](https://drive.google.com/file/d/1UTjqJnB62GFmgRR9pAzhbGYkBtRgvjeV/view?usp=sharing)
+    
     To install:
     1. Settings - icon > Tools > Extensions
 
-    2. Enable Developer Mode ( toggle button in top-right corner )
+    2. Enable Developer Mode (toggle button in top-right corner)
 
     3. Drag and drop the '.crx' extension file onto the Extensions page
 
