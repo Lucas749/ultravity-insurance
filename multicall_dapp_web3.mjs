@@ -322,7 +322,7 @@ var poolInfo = await getPoolInfo(rpcUrl, poolAddress, poolAbi, ultravityScore, d
 console.log(poolInfo);
 
 //Get Premium Rate
-ultravityScore = 70;
+ultravityScore = 60;
 deviationThreshold = 2;
 var premiumRate = await getPremiumRate(rpcUrl, poolAddress, poolAbi, ultravityScore, deviationThreshold);
 console.log("Premium rate is", premiumRate);
