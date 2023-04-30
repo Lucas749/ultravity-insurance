@@ -66,7 +66,7 @@ import ethers from "ethers";
 
 // Set up the private key
 // const privateKey = "0x0x0x0x0";
-// const nodeUrl = 'https://eth-goerli.g.alchemy.com/v2/VftFU7tFVH2gGnJdalT4MEw40ZGKSga8';
+
 
 // MetaMask provider
 const provider = new ethers.providers.Web3Provider(window.ethereum);
