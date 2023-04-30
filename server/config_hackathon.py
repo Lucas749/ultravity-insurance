@@ -14,4 +14,4 @@ permit2_contract_mantle = "0x08B4434924801AC9C0B1a65D21562f2964b0787B"
 ####################################################
 #General
 ####################################################
-node_url = "https://rpc.testnet.mantle.xyz"
+node_url_mantle = "https://rpc.testnet.mantle.xyz"
