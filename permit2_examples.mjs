@@ -82,7 +82,11 @@ async function getSignature(permitContract,insuranceContract,tokenAddress,premiu
     const permit = new ethers.Contract(permitContract, permit2Abi, signer);
 
 
-    const nonce = (await permit.allowance(signer.address, tokenAddress, insuranceContract)).expiration;
+    //Not working
+    var nonce = (await permit.allowance(signer.address, tokenAddress, insuranceContract)).expiration;
+
+    //Get random nonce
+    nonce = Math.floor(Math.random() * 1001);
     const deadline = Math.floor(Date.now() / 1000) + 10000000;
     console.log('deadline', deadline);
     
@@ -107,10 +111,11 @@ async function getSignature(permitContract,insuranceContract,tokenAddress,premiu
     return {"sig":signature, "nonce": nonce, "deadline":deadline};
 }
 
-const permitContract = "0x08B4434924801AC9C0B1a65D21562f2964b0787B"; //0x9345915e2f1d0105695Dd4689774B5f44f67A787
-const insuranceContract = "0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1";//"0x35a3a5ed7eEdbdE2Ae8BE83687559564e5Df837f";
+const permitContract = "0x08B4434924801AC9C0B1a65D21562f2964b0787B";
+const insuranceContract = "0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1";
 const tokenAddress = "0xc0A7F1B0c9988FbC123f688a521387A51596da47";
-const premiumAmount = 100;//ethers.utils.parseEther("100");
+const premiumAmount = 100;
+
 // getSignature(permitContract,insuranceContract,tokenAddress,premiumAmount);
 // Request user account access
 window.ethereum
