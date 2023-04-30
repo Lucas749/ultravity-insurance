@@ -103,6 +103,8 @@ import {approvingContract, signingContract} from "../util/contract";
 import {abi} from "../util/contract";
 
 function ContentCardsSection(props) {
+  const successAlertOpen = props.successAlertOpen
+  const setSuccessAlertOpen= props.setSuccessAlertOpen
   const [items, setItems] = useState(defaultItems);
   console.log(items)
   
@@ -151,6 +153,8 @@ function ContentCardsSection(props) {
         gasLimit: 300000,
         gasPrice: gasPrice.mul(1),
       });
+
+      setSuccessAlertOpen(true)
     
     } catch (error) {
       console.error('Error staking:', error);
@@ -191,13 +195,13 @@ function ContentCardsSection(props) {
           ...poolData,
           riskScore: 1 + poolData.score,
           deviationIndex: poolData.deviationIndex,
-          apr: `${(poolData.baseRate * 100).toFixed(2)}%`, // Set APR based on base-rate
+          apr: `Pool Return: ${(poolData.valueAccrual * 100).toFixed(2)}%`, // Set APR based on base-rate
           amount: `Total Staked: ${poolData.totalStaked} BIT`,
           description: poolData.deviationIndex === 0
           ? 'Insures transactions that deviate less than 2'
           : poolData.deviationIndex === 1
-          ? 'Insures transactions that deviate less than 5'
-          : 'Insures transactions that deviate more than 5',
+          ? 'Insures transactions that deviate between 2% and 5%'
+          : 'Insures transactions that deviate more than 5%',
         };
       });
   
@@ -248,7 +252,7 @@ function ContentCardsSection(props) {
           size={4}
           sx={{ textAlign: "center" }}
         />
-        <Grid container={true} justifyContent="center" spacing={4}>
+        <Grid container={true} justifyContent="center" spacing={5}>
           {items.map((item, index) => (
             <Grid item={true} xs={12} md={6} lg={4} key={index}>
               <Card
@@ -317,10 +321,10 @@ function ContentCardsSection(props) {
                         }}
                       >
                         <Typography
-                          variant="h6"
+                          variant="h7"
                           component="div"
                           color="success.main"
-                          fontWeight="bold"
+                         
                         >
                           {item.apr}
                         </Typography>
@@ -332,7 +336,7 @@ function ContentCardsSection(props) {
                           }}
                         >
                           <Typography
-                            variant="body1"
+                            variant="h7"
                             component="div"
                             color="textPrimary"
                           >
@@ -408,13 +412,8 @@ function ContentCardsSection(props) {
                   />
                   <Typography>
                   <br></br>
-                    APR: {selectedPool.apr}</Typography>
-                <Typography>
-               
-
-                  Indicative Earnings:{" "}
-                  {((parseFloat(stakeAmount) * parseFloat(selectedPool.apr)) / 100).toFixed(2)} BIT
-                </Typography>
+                    Base Insurance Rate: {selectedPool.apr}</Typography>
+              
                 </Box>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: "center" }}>

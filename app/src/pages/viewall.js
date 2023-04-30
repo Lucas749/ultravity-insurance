@@ -10,7 +10,8 @@ import Section from "components/Section";
 import SectionHeader from "components/SectionHeader";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { styled } from "@mui/system";
 
 import { Typography } from "@mui/material";
@@ -54,7 +55,8 @@ const [rows, setRows] = useState([]);
    
   const [value, setValue] = useState('all')
   const [searchText, setSearchText] = useState("Frog");
-  
+  const [successAlertOpen, setSuccessAlertOpen] = useState(false);
+
 
 
 
@@ -65,6 +67,16 @@ const [rows, setRows] = useState([]);
 
     <> 
       <Meta title="Dashboard" />
+      <Snackbar
+      open={successAlertOpen}
+      autoHideDuration={6000}
+      onClose={handleCloseSuccessAlert}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert onClose={handleCloseSuccessAlert} severity="success">
+        Coverage successfully purchased!
+      </Alert>
+    </Snackbar>
       <Section
       bgColor={props.bgColor}
       size={props.size}
@@ -80,34 +92,34 @@ const [rows, setRows] = useState([]);
         />
 
         
-        <Grid container={true} spacing={2}>
-        <Grid item={true} xs={12} md={4}>
+        <Grid container={true} justifyContent="center" spacing={4}>
+        <Grid item={true} ml={-4} mr={4}xs={12} md={4}>
               <Card>
                       <CardContent sx={{ padding: 3}}>
                       <GradientHighText sx={{ fontWeight: "bold" }} variant="h5">
                     High Risk
                       </GradientHighText>
-                      <Typography>High risk, high reward</Typography>
+                      <Typography>Insures transactions with Ultravity scores of less than 50</Typography>
                       </CardContent>
               </Card>
             </Grid>
-            <Grid item={true} xs={12} md={4}>
+            <Grid item={true} ml={-4} xs={12} md={4}>
               <Card>
                       <CardContent sx={{ padding: 3}}>
                         <GradientMediumText sx={{ fontWeight: "bold" }} variant="h5">
                       Medium Risk
                       </GradientMediumText>
-                      <Typography>Medium risk, medium reward</Typography>
+                      <Typography>Insures transactions with Ultravity scores of 50 to 70</Typography>
                       </CardContent>
               </Card>
             </Grid>
-          <Grid item={true} xs={12} md={4}>
+          <Grid item={true} ml={0} xs={12} md={4}>
               <Card>
                       <CardContent sx={{ padding: 3}}>
                       <GradientLowText sx={{ fontWeight: "bold" }} variant="h5">
                     Low Risk
                       </GradientLowText>
-                      <Typography>Low Risk, lowest reward</Typography>
+                      <Typography>Insures transactions with Ultravity scores of more than 70</Typography>
                       </CardContent>
               </Card>
             </Grid>
@@ -116,7 +128,7 @@ const [rows, setRows] = useState([]);
       
           
           
-         <ContentCardsSection />  
+         <ContentCardsSection successAlertOpen = {successAlertOpen} setSuccessAlertOpen= {setSuccessAlertOpen} />  
               
                
     
