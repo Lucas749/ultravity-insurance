@@ -18,7 +18,12 @@ import { Typography } from "@mui/material";
 
 import Web3 from 'web3';
 import { useNetwork } from 'wagmi'
-
+const handleCloseSuccessAlert = (event, reason) => {
+  if (reason === "clickaway") {
+    return;
+  }
+  setSuccessAlertOpen(false);
+};
 
 const GradientHighText = styled(Typography)(({ theme }) => ({
   backgroundClip: "text",
@@ -74,7 +79,7 @@ const [rows, setRows] = useState([]);
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
     >
       <Alert onClose={handleCloseSuccessAlert} severity="success">
-        Coverage successfully purchased!
+      Staking Successful!
       </Alert>
     </Snackbar>
       <Section

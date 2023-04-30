@@ -412,7 +412,8 @@ function ContentCardsSection(props) {
                   />
                   <Typography>
                   <br></br>
-                    Base Insurance Rate: {selectedPool.apr}</Typography>
+                  Base Insurance Rate: {selectedPool.apr.replace("Pool Return:", "")}
+</Typography>
               
                 </Box>
                 </DialogContent>
