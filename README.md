@@ -15,5 +15,12 @@ Web app deployed under XXX
 
 Chrome extension available under https://www.ultravity.co/
 
+Demo video is uploaded under XXX
+
+# Demo transactions
+Insurance transaction: [0x](https://explorer.testnet.mantle.xyz/address/0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1)  
+Insured transaction: [0x](https://explorer.testnet.mantle.xyz/address/0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1)
+Insurance payout transaction: [0x](https://explorer.testnet.mantle.xyz/address/0xebE4C3052624a9909b1F5E8EAD080155dcDffdb1)
+
 # Architecture
-![Archicture](architecture.png)
+![Architecture](architecture.png)

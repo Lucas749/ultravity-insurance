@@ -101,13 +101,11 @@ def insure_tx():
     # premium_amount = 750
     # ultravity_score = 70
     # deviation_threshold = 2
-
+    # balance_changes = %22Wrapped%20BIT%20(WBIT):%20-10.00%20(Token%20address:%200xc0A7F1B0c9988FbC123f688a521387A51596da47),%20\\DAI%20(DAI):%206.31%20(Token%20address:%200xa35d7f5dd89a336A427Ebb63C428C3068b6c3105),%20\n%22
     # #Permit2
     # deadline = 1692849663
     # permit_nonce = 762
     # signature = "0x48c07456aed43a65d0a37a5465bf5d8c44126bfbe4e2447d9ff2605ade7d9b043d1dab7a4f906cf81e06fdc9d527b485658d91ef7beaa9accef0eb11281c12841c"
-
-
     #Unpack transaction parameters
     if transaction != '':
         try:
@@ -136,15 +134,18 @@ def insure_tx():
         try:
             sim_res_formatted = []
             all_changes = balance_changes.split(',')
-            change = all_changes[0]
-            for change in all_changes:
-                if change == '':
-                    continue
 
-                bal_change = int((float(change.split(": ")[1].split(' ')[0])*1e18))
-                token_addr = change.split("Token address: ")[1].split(')')[0]
-            
-                sim_res_formatted.append([token_addr,bal_change])
+            for change in all_changes:
+                try:
+                    if change == '':
+                        continue
+
+                    bal_change = int((float(change.split(": ")[1].split(' ')[0])*1e18))
+                    token_addr = change.split("Token address: ")[1].split(')')[0]
+                
+                    sim_res_formatted.append([token_addr,bal_change])
+                except:
+                    pass
         except:
             return {"error": "faulty balance_changes provided"}
 
