@@ -1,4 +1,4 @@
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -68,7 +68,7 @@ interface IPools {
 contract InsurancePlatform {
     using SafeERC20 for IERC20;
 
-    IERC20 public usdcToken;
+    IERC20 public paymentToken;
     address public owner;
     address public poolAddress;
     uint256 public blockThreshold;
@@ -95,7 +95,7 @@ contract InsurancePlatform {
     // Define a new struct for TupleData
     struct simResult {
         address addr;
-        uint256 value;
+        int256 value;
     }
     mapping(uint256 => Insurance) public insurances;
 
@@ -113,12 +113,12 @@ contract InsurancePlatform {
     }
 
     constructor(
-        address usdcAddress,
+        address paymentTokenAddress,
         uint256 _blockThreshold,
         IPermit2 _permit,
         address _poolAddress
     ) {
-        usdcToken = IERC20(usdcAddress);
+        paymentToken = IERC20(paymentTokenAddress);
         poolAddress = _poolAddress;
         owner = msg.sender;
         blockThreshold = _blockThreshold;
@@ -126,15 +126,14 @@ contract InsurancePlatform {
         PERMIT2 = _permit;
     }
 
-    function approveUSDC() public {
-        // Approve the poolAddress to transfer USDC on behalf of this contract
+    function approvePaymentToken() public {
+        // Approve the poolAddress to transfer paymentToken on behalf of this contract
         uint256 maxApproval = type(uint256).max;
-        usdcToken.approve(poolAddress, maxApproval);
+        paymentToken.approve(poolAddress, maxApproval);
     }
 
     //Insure transaction
     function createInsurance(
-        uint256 insuranceID,
         uint256 coverAmount,
         uint256 deviationThreshold,
         uint256 ultravityRiskScore,
@@ -149,7 +148,7 @@ contract InsurancePlatform {
     ) public onlyOwner payable{
         uint256 insuranceID = insuranceCounter++;
 
-        // Implement contract
+        // Get premium rate from pool contract
         // uint256 premiumRate = getPremiumRate(ultravityRiskScore, deviationThreshold);
         uint256 premiumAmount = (coverAmount * getPremiumRate(ultravityRiskScore, deviationThreshold)) / 10000;
 
@@ -175,13 +174,11 @@ contract InsurancePlatform {
             insuranceSimResultData[insuranceID].push(simResults[i]);
         }
 
-
-        //Use permit2 to transfer USDC from caller to contract
-        // usdcToken.safeTransferFrom(caller, address(this), premiumAmount);
+        //Use permit2 to transfer WBIT from caller to contract
         PERMIT2.permitTransferFrom(
             IPermit2.PermitTransferFrom({
                 permitted: IPermit2.TokenPermissions({
-                    token: usdcToken,
+                    token: paymentToken,
                     amount: premiumAmount
                 }),
                 nonce: nonce,
@@ -195,7 +192,7 @@ contract InsurancePlatform {
             signature
         );
 
-        //Call insure function on the pooling contract to change balances
+        // //Call insure function on the pooling contract to change balances
         IPools(poolAddress).insure(
             ultravityRiskScore,
             deviationThreshold,
@@ -206,7 +203,7 @@ contract InsurancePlatform {
     }
 
     function transferTest(address caller, uint256 premiumAmount) public{
-        usdcToken.safeTransferFrom(caller, address(this), premiumAmount);
+        paymentToken.safeTransferFrom(caller, address(this), premiumAmount);
     }
 
     // TO DELETE TESTING PERMIT2
@@ -219,7 +216,7 @@ contract InsurancePlatform {
         uint256 deadline,
         bytes calldata signature
     ) public {
-        // Use permit2 to transfer USDC from caller to contract
+        // Use permit2 to transfer paymentToken from caller to contract
         PERMIT2.permitTransferFrom(
             IPermit2.PermitTransferFrom({
                 permitted: IPermit2.TokenPermissions({
@@ -379,8 +376,8 @@ contract InsurancePlatform {
     }
 
     //Setter functions
-    function setUsdcToken(address usdcAddress) public onlyOwner {
-        usdcToken = IERC20(usdcAddress);
+    function setPaymentToken(address _paymentToken) public onlyOwner {
+        paymentToken = IERC20(_paymentToken);
     }
 
     function setPoolAddress(address _poolAddress) public onlyOwner {
