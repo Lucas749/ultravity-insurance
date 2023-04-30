@@ -13,8 +13,6 @@ os.getcwd()
 os.chdir('./server')
 from config_hackathon import  *
 from config_private import account, private_key
-
-
 from web3 import Web3
 
 #Set up Flask app
@@ -24,6 +22,11 @@ print('ready')
 
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
+
+
+from config_hackathon import  *
+from config_private import account, private_key
+from web3 import Web3
 
 # Get last tx hash from mantle explorer
 def get_last_tx_hash(address):
@@ -54,13 +57,6 @@ def get_balance_changes_from_receipt(tx_receipt):
             elif to_address == sender:
                 balance_changes[log.address] = +value_send
     return balance_changes
-
-
-#Set up routes
-@app.route('/', methods=['GET'])
-@cross_origin(headers=['Content- Type','Authorization'])
-def landing_page():
-    return "Welcome to Ultravity Insurance"
 
 # http://127.0.0.1:5000/api/insuretx?contract_address=0xf2B719136656BF21c2B2a255F586afa34102b71d&chain=5001&cover_amount=10000&premium_amount=750&ultravity_score=70&deviation_threshold=2&deadline=166666&nonce=2&signature=0x3412485da985ad2cc4a157a1610f43877ecbe333952323d8114a520d13b835af3cfef9e82ab3d3f02201a89d0c97883cda5c1019be066e83beab2eb9065ed3671c&balance_changes=Ether (ETH): -0.003 (Token address: 0x0000000000000000000000000000000000000000), \nAave Token (AAVE): 0.07980520369607302 (Token address: 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9),&transaction={%22data%22:%220x3593564c000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000644e1e4300000000000000000000000000000000000000000000000000000000000000020b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000aa87bee53800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000aa87bee538000000000000000000000000000000000000000000000000000010e061acda64ee600000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002bc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb87fc66500c84a76ad7e9c93437bfc5ac33e2ddae9000000000000000000000000000000000000000000%22,%22from%22:%220x82cce31fd049b7cd23de3d1f201aea09907b9c25%22,%22gas%22:%220x68871%22,%22to%22:%220xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b%22,%22value%22:%220xaa87bee538000%22}
 @app.route('/api/insuretx', methods=['GET'])
@@ -219,6 +215,8 @@ def insure_tx():
             tx_found = True
             break
 
+        print("Looking for new transaction")
+
     if not tx_found:
         return {'error': 'no user transaction not found - consider refund'}
     else:
@@ -229,7 +227,7 @@ def insure_tx():
             return {'error': 'cannot get user transaction from mantle - consider refund'}
             
         tx_receipt = web3.eth.get_transaction_receipt(last_tx_hash)
-        
+
         #Get tx balance changes 
         act_balance_changes = get_balance_changes_from_receipt(tx_receipt)
         sim_balance_changes = dict(sim_res_formatted)
@@ -276,3 +274,5 @@ def insure_tx():
 if __name__ == '__main__':
     #Server settings
     app.run()
+
+
