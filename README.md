@@ -15,9 +15,19 @@ Staking page under https://ultravityinsure.vercel.app/
 
 Insurance page under https://ultravityinsure.vercel.app/insure  
 
-Chrome extension available under https://www.ultravity.co/
+Chrome extension available under [here](https://drive.google.com/file/d/1UTjqJnB62GFmgRR9pAzhbGYkBtRgvjeV/view?usp=sharing)
+    To install:
+    1. Settings - icon > Tools > Extensions
+
+    2. Enable Developer Mode ( toggle button in top-right corner )
+
+    3. Drag and drop the '.crx' extension file onto the Extensions page
+
+    4. Install
 
 Demo video is uploaded [here](https://drive.google.com/file/d/1sC2VAvzFW3Bud5ryUdSkNuELXDRs584p/view?usp=share_link)
+
+Presentation uploaded [here](XXX)
 
 # Demo transactions
 Insurance transaction: [0x0fd8a17390ba4b5a3d34eaf8014234ace1161af9c7245db3c027895d19171a7a](https://explorer.testnet.mantle.xyz/tx/0x0fd8a17390ba4b5a3d34eaf8014234ace1161af9c7245db3c027895d19171a7a)
