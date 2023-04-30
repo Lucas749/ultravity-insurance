@@ -15,7 +15,7 @@ Staking page under https://ultravityinsure.vercel.app/
 
 Insurance page under https://ultravityinsure.vercel.app/insure  
 
-Chrome extension available under [here](https://drive.google.com/file/d/1UTjqJnB62GFmgRR9pAzhbGYkBtRgvjeV/view?usp=sharing)
+Chrome extension available [here](https://drive.google.com/file/d/1UTjqJnB62GFmgRR9pAzhbGYkBtRgvjeV/view?usp=sharing)
     
     To install:
     1. Settings - icon > Tools > Extensions
